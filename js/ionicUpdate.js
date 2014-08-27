@@ -67,10 +67,10 @@ angular.module('ionic.services.update', ['ionic.services.common'])
         var deferred = $q.defer();
 
         IonicUpdate.download(function(result) {
-          if (result !== 'done') {
+          if (result !== 'true' && result !== 'false') {
             deferred.notify(result);
           } else {
-            deferred.resolve(result);
+            deferred.resolve(result === 'true');
           }
         }, function(error) {
           deferred.reject(error);
