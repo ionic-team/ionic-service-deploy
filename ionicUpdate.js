@@ -117,6 +117,60 @@ angular.module('ionic.services.update', ['ionic.services.common'])
         if (typeof IonicUpdate != "undefined") {
           IonicUpdate.initialize(app_id);
         }
+      },
+
+      update: function() {
+        // This is an all-in-one function that's meant to do all of the update steps
+        // in one shot.
+        // NB: I think that the way to handle progress is to divide the provided progress result
+        //     of each part by two (download and extract) and report that value.
+
+        var deferred = $q.defer();
+
+        if (typeof IonicUpdate != "undefined") {
+          // Check for updates
+          IonicUpdate.check(function(result) {
+            if (result === 'true') {
+              // There are updates, download them
+              var progress = 0;
+              IonicUpdate.download(function(result) {
+                if (result !== 'true' && result !== 'false') {
+                  // Download is only half of the reported progress
+                  progress = progress + (result / 2);
+                  deferred.notify(progress);
+                } else {
+                  // Download complete, now extract
+                  IonicUpdate.extract(function(result) {
+                    if (result !== 'done') {
+                      // Extract is only half of the reported progress
+                      progress = progress + (result / 2);
+                      deferred.notify(progress);
+                    } else {
+                      // Extraction complete, now redirect
+                      IonicUpdate.redirect();
+                    }
+                  }, function(error) {
+                    // Error extracting updates
+                    deferred.reject(error);
+                  });
+                }
+              }, function(error) {
+                // Error downloading updates
+                deferred.reject(error);
+              });
+            } else {
+              // There are no updates, redirect
+              IonicUpdate.redirect();
+            }
+          }, function(error) {
+            // Error checking for updates
+            deferred.reject(error);
+          });
+        } else {
+          deferred.reject("Plugin not loaded");
+        }
+
+        return deferred.promise;
       }
     }
 }])
