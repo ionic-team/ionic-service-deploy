@@ -1,4 +1,4 @@
-ionic-service-update
+ionic-service-deploy
 ====================
 
-Update service for Ionic
+App deploy service for Ionic. Official docs: http://docs.ionic.io/services/deploy/
