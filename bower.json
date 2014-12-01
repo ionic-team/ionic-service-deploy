@@ -1,12 +1,12 @@
 {
-  "name": "ionic-service-update",
+  "name": "ionic-service-deploy",
   "version": "0.0.1",
   "homepage": "http://ionic.io",
   "authors": [
-    "Max Lynch <max@ionicframework.com>"
+    "Joel Weirauch <joel@drifty.com>",
   ],
-  "description": "Ionic Mobile Platform Update client",
-  "main": "ionicUpdate.js",
+  "description": "Ionic Mobile Platform Deploy client",
+  "main": "ionic-deploy.js",
   "license": "Apache2",
   "ignore": [
     "**/.*",
