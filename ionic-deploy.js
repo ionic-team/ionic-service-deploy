@@ -49,13 +49,14 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
  */
 .factory('$ionicDeploy', [
     '$q',
+    '$ionicApp',
   function($q) {
     return {
       check: function() {
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.check(function(result) {
+          IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
             deferred.resolve(result === 'true');
           }, function(error) {
             deferred.reject(error);
@@ -71,7 +72,7 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.download(function(result) {
+          IonicDeploy.download($ionicApp.getApp().app_id, function(result) {
             if (result !== 'true' && result !== 'false') {
               deferred.notify(result);
             } else {
@@ -91,7 +92,7 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.extract(function(result) {
+          IonicDeploy.extract($ionicApp.getApp().app_id, function(result) {
             if (result !== 'done') {
               deferred.notify(result);
             } else {
@@ -109,7 +110,7 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
 
       load: function() {
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.redirect();
+          IonicDeploy.redirect($ionicApp.getApp().app_id);
         }
       },
 
@@ -129,25 +130,25 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
 
         if (typeof IonicDeploy != "undefined") {
           // Check for updates
-          IonicDeploy.check(function(result) {
+          IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
             if (result === 'true') {
               // There are updates, download them
               var progress = 0;
-              IonicDeploy.download(function(result) {
+              IonicDeploy.download($ionicApp.getApp().app_id, function(result) {
                 if (result !== 'true' && result !== 'false') {
                   // Download is only half of the reported progress
                   progress = progress + (result / 2);
                   deferred.notify(progress);
                 } else {
                   // Download complete, now extract
-                  IonicDeploy.extract(function(result) {
+                  IonicDeploy.extract($ionicApp.getApp().app_id, function(result) {
                     if (result !== 'done') {
                       // Extract is only half of the reported progress
                       progress = progress + (result / 2);
                       deferred.notify(progress);
                     } else {
                       // Extraction complete, now redirect
-                      IonicDeploy.redirect();
+                      IonicDeploy.redirect($ionicApp.getApp().app_id);
                     }
                   }, function(error) {
                     // Error extracting updates
@@ -160,7 +161,7 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
               });
             } else {
               // There are no updates, redirect
-              IonicDeploy.redirect();
+              IonicDeploy.redirect($ionicApp.getApp().app_id);
             }
           }, function(error) {
             // Error checking for updates
