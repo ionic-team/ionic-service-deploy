@@ -1,9 +1,9 @@
-angular.module('ionic.services.update', ['ionic.services.common'])
+angular.module('ionic.services.deploy', ['ionic.services.common'])
 
 /**
  * @ngdoc service
  * @name $ionicDeploy
- * @module ionic.services.update
+ * @module ionic.services.deploy
  * @description
  *
  * A simple way to push updates to your app.
