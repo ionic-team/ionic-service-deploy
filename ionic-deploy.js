@@ -50,7 +50,7 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
 .factory('$ionicDeploy', [
     '$q',
     '$ionicApp',
-  function($q) {
+  function($q, $ionicApp) {
     return {
       check: function() {
         var deferred = $q.defer();
