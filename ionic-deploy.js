@@ -1,4 +1,4 @@
-angular.module('ionic.services.deploy', ['ionic.services.common'])
+angular.module('ionic.services.deploy', ['ionic.services.core'])
 
 /**
  * @ngdoc service
@@ -14,8 +14,6 @@ angular.module('ionic.services.deploy', ['ionic.services.common'])
  *
  * @usage
  * ```javascript
- * $ionicDeploy.initialize('8cdd99a2');
- * 
  * // Check for updates
  * $ionicDeploy.check().then(function(response) {
  *    // response will be true/false
