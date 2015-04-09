@@ -62,12 +62,15 @@ angular.module('ionic.services.deploy', ['ionic.services.core'])
        * event when one is ready.
        */
       watch: function() {
+        var deferred = $q.defer();
 
         function checkForUpdates() {
           this.check().then(function(hasUpdate) {
             if(hasUpdate) {
               $rootScope.$emit('$ionicDeploy:updateAvailable');
             }
+            // Notify
+            deferred.notify(hasUpdate);
           }, function(err) {
             console.warn('Unable to check for Ionic Deploy updates', err);
           });
@@ -76,6 +79,8 @@ angular.module('ionic.services.deploy', ['ionic.services.core'])
 
         // Check immediately
         setTimeout(checkForUpdates.bind(this));
+
+        return deferred.promise;
       },
 
       check: function() {
