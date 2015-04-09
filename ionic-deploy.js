@@ -20,6 +20,18 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
  *
  * @usage
  * ```javascript
+ *
+ * $ionicDeploy.watch().then(function(){}, function(){}, function(hasUpdate) {
+ *   // called whenever there is a new version.
+ *   // Show a prompt to the user asking them to update or not
+ *   // If they choose to update, call $ionicDeploy.update();
+ * });
+ *
+ * $ionicDeploy.unwatch() to stop watching for updates.
+ *
+ *
+ * Full-manual mode to check/download/extract and update:
+ *
  * // Check for updates
  * $ionicDeploy.check().then(function(response) {
  *    // response will be true/false
@@ -83,15 +95,31 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
           }, function(err) {
             console.warn('$ionicDeploy: Unable to check for Ionic Deploy updates', err);
           });
-          setTimeout(checkForUpdates.bind(this), opts.interval);
+
+          // Check our timeout to make sure it wasn't cleared while we were waiting
+          // for a server response
+          if(this.checkTimeout) {
+            this.checkTimeout = setTimeout(checkForUpdates.bind(this), opts.interval);
+          }
         }
 
         // Check after an initial short deplay
-        setTimeout(checkForUpdates.bind(this), opts.initialDelay);
+        this.checkTimeout = setTimeout(checkForUpdates.bind(this), opts.initialDelay);
 
         return deferred.promise;
       },
 
+      /**
+       * Stop watching for updates.
+       */
+      unwatch: function() {
+        clearTimeout(this.checkTimeout);
+        this.checkTimeout = null;
+      },
+
+      /**
+       * Check the deploy server for new versions (if any)
+       */
       check: function() {
         var deferred = $q.defer();
 
@@ -108,6 +136,10 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         return deferred.promise;
       },
 
+      /**
+       * Download the new verison.
+       * See update() below for a version that does this for you
+       */
       download: function() {
         var deferred = $q.defer();
 
@@ -128,6 +160,10 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         return deferred.promise;
       },
 
+      /**
+       * Extract the new version.
+       * See update() below for a version that does this for you
+       */
       extract: function() {
         var deferred = $q.defer();
 
@@ -148,24 +184,31 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         return deferred.promise;
       },
 
+      /**
+       * Load the saved version of our app.
+       */
       load: function() {
         if (typeof IonicDeploy != "undefined") {
           IonicDeploy.redirect($ionicApp.getApp().app_id);
         }
       },
 
+      /**
+       * Initialize the app
+       */
       initialize: function(app_id) {
         if (typeof IonicDeploy != "undefined") {
           IonicDeploy.initialize(app_id);
         }
       },
 
+      /**
+       * This is an all-in-one function that's meant to do all of the update steps
+       * in one shot.
+       * NB: I think that the way to handle progress is to divide the provided progress result
+       *     of each part by two (download and extract) and report that value.
+       */
       update: function() {
-        // This is an all-in-one function that's meant to do all of the update steps
-        // in one shot.
-        // NB: I think that the way to handle progress is to divide the provided progress result
-        //     of each part by two (download and extract) and report that value.
-
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
