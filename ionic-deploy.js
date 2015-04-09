@@ -1,5 +1,8 @@
 angular.module('ionic.service.deploy', ['ionic.service.core'])
 
+// Check after 5 seconds on initial load
+.constant('INITIAL_DELAY', 1 * 5 * 1000)
+
 // Watch every minute
 .constant('WATCH_INTERVAL', 1 * 60 * 1000)
 
@@ -54,15 +57,21 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
     '$rootScope',
     '$ionicApp',
     'WATCH_INTERVAL',
-  function($q, $timeout, $rootScope, $ionicApp, WATCH_INTERVAL) {
+    'INITIAL_DELAY',
+  function($q, $timeout, $rootScope, $ionicApp, WATCH_INTERVAL, INITIAL_DELAY) {
     return {
       
       /**
        * Watch constantly checks for updates, and triggers an 
        * event when one is ready.
        */
-      watch: function() {
+      watch: function(options) {
         var deferred = $q.defer();
+
+        var opts = angular.extend({
+          initialDelay: INITIAL_DELAY,
+          interval: WATCH_INTERVAL
+        }, options);
 
         function checkForUpdates() {
           this.check().then(function(hasUpdate) {
@@ -74,11 +83,11 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
           }, function(err) {
             console.warn('Unable to check for Ionic Deploy updates', err);
           });
-          setTimeout(checkForUpdates, WATCH_INTERVAL);
+          setTimeout(checkForUpdates, opts.interval);
         }
 
-        // Check immediately
-        setTimeout(checkForUpdates.bind(this));
+        // Check after an initial short deplay
+        setTimeout(checkForUpdates.bind(this) opts.initialDelay);
 
         return deferred.promise;
       },
