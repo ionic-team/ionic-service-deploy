@@ -83,7 +83,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
           }, function(err) {
             console.warn('$ionicDeploy: Unable to check for Ionic Deploy updates', err);
           });
-          setTimeout(checkForUpdates, opts.interval);
+          setTimeout(checkForUpdates.bind(this), opts.interval);
         }
 
         // Check after an initial short deplay
