@@ -87,7 +87,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         }
 
         // Check after an initial short deplay
-        setTimeout(checkForUpdates.bind(this) opts.initialDelay);
+        setTimeout(checkForUpdates.bind(this), opts.initialDelay);
 
         return deferred.promise;
       },
