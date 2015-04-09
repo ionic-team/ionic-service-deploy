@@ -1,4 +1,4 @@
-angular.module('ionic.services.deploy', ['ionic.services.core'])
+angular.module('ionic.service.deploy', ['ionic.services.core'])
 
 // Watch every minute
 .constant('WATCH_INTERVAL', 1 * 60 * 1000)
