@@ -1,5 +1,8 @@
 angular.module('ionic.services.deploy', ['ionic.services.core'])
 
+// Watch every minute
+.constant('WATCH_INTERVAL', 1 * 60 * 1000)
+
 /**
  * @ngdoc service
  * @name $ionicDeploy
@@ -47,9 +50,34 @@ angular.module('ionic.services.deploy', ['ionic.services.core'])
  */
 .factory('$ionicDeploy', [
     '$q',
+    '$timeout',
+    '$rootScope',
     '$ionicApp',
-  function($q, $ionicApp) {
+    'WATCH_INTERVAL',
+  function($q, $timeout, $rootScope, $ionicApp, WATCH_INTERVAL) {
     return {
+      
+      /**
+       * Watch constantly checks for updates, and triggers an 
+       * event when one is ready.
+       */
+      watch: function() {
+
+        function checkForUpdates() {
+          this.check().then(function(hasUpdate) {
+            if(hasUpdate) {
+              $rootScope.$emit('$ionicDeploy:updateAvailable');
+            }
+          }, function(err) {
+            console.warn('Unable to check for Ionic Deploy updates', err);
+          });
+          setTimeout(checkForUpdates, WATCH_INTERVAL);
+        }
+
+        // Check immediately
+        setTimeout(checkForUpdates.bind(this));
+      },
+
       check: function() {
         var deferred = $q.defer();
 
