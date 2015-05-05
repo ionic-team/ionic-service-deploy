@@ -72,9 +72,9 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
     'INITIAL_DELAY',
   function($q, $timeout, $rootScope, $ionicApp, WATCH_INTERVAL, INITIAL_DELAY) {
     return {
-      
+
       /**
-       * Watch constantly checks for updates, and triggers an 
+       * Watch constantly checks for updates, and triggers an
        * event when one is ready.
        */
       watch: function(options) {
@@ -125,6 +125,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
 
         if (typeof IonicDeploy != "undefined") {
           IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
+            console.log("DEBUG DEPLOY: " + result);
             deferred.resolve(result === 'true');
           }, function(error) {
             deferred.reject(error);
@@ -224,12 +225,14 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
                   deferred.notify(progress);
                 } else {
                   // Download complete, now extract
+                  console.log("Download complete");
                   IonicDeploy.extract($ionicApp.getApp().app_id, function(result) {
                     if (result !== 'done') {
                       // Extract is only half of the reported progress
                       progress = progress + (result / 2);
                       deferred.notify(progress);
                     } else {
+                      console.log("Extract complete");
                       // Extraction complete, now redirect
                       IonicDeploy.redirect($ionicApp.getApp().app_id);
                     }
@@ -258,3 +261,18 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
       }
     }
 }])
+
+.run(['$ionicApp', function($ionicApp) {
+
+  document.addEventListener("deviceready", onDeviceReady, false);
+
+  function onDeviceReady() {
+    console.log("Ionid Deploy: Init");
+    if (typeof IonicDeploy != "undefined") {
+      if (ionic.Platform.isAndroid()) {
+        IonicDeploy.init($ionicApp.getApp().app_id);
+      }
+      IonicDeploy.redirect($ionicApp.getApp().app_id);
+    }
+  };
+}]);

@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "homepage": "http://ionic.io",
   "authors": [
-    "Joel Weirauch <joel@drifty.com>"
+    "Joel Weirauch <joel@drifty.com>",
+    "William Pelrine <rudy@drifty.com>",
+    "Eric Bobbitt <eric@drifty.com>"
   ],
   "description": "Ionic Mobile Platform Deploy client",
   "main": "ionic-deploy.js",
