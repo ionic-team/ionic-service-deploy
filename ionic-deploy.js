@@ -267,7 +267,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
   document.addEventListener("deviceready", onDeviceReady, false);
 
   function onDeviceReady() {
-    console.log("Ionid Deploy: Init");
+    console.log("Ionic Deploy: Init");
     if (typeof IonicDeploy != "undefined") {
       if (ionic.Platform.isAndroid()) {
         IonicDeploy.init($ionicApp.getApp().app_id);
