@@ -271,8 +271,9 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
     if (typeof IonicDeploy != "undefined") {
       if (ionic.Platform.isAndroid()) {
         IonicDeploy.init($ionicApp.getApp().app_id);
+      } else {
+        IonicDeploy.redirect($ionicApp.getApp().app_id);
       }
-      IonicDeploy.redirect($ionicApp.getApp().app_id);
     }
   };
 }]);
