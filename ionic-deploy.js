@@ -217,19 +217,19 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
           IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
             if (result === 'true') {
               // There are updates, download them
-              var progress = 0;
+              var downloadProgress = 0;
               IonicDeploy.download($ionicApp.getApp().app_id, function(result) {
                 if (result !== 'true' && result !== 'false') {
                   // Download is only half of the reported progress
-                  progress = progress + (result / 2);
-                  deferred.notify(progress);
+                  downloadProgress = (result / 2);
+                  deferred.notify(downloadProgress);
                 } else {
                   // Download complete, now extract
                   console.log("Download complete");
                   IonicDeploy.extract($ionicApp.getApp().app_id, function(result) {
                     if (result !== 'done') {
                       // Extract is only half of the reported progress
-                      progress = progress + (result / 2);
+                      var progress = downloadProgress + (result / 2);
                       deferred.notify(progress);
                     } else {
                       console.log("Extract complete");
