@@ -259,7 +259,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
 
         return deferred.promise;
       }
-    }
+    };
 }])
 
 .run(['$ionicApp', function($ionicApp) {
@@ -269,11 +269,11 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
   function onDeviceReady() {
     console.log("Ionic Deploy: Init");
     if (typeof IonicDeploy != "undefined") {
-      if (ionic.Platform.isAndroid()) {
+      if ($ionicApp.getDeviceTypeByNavigator() === 'android') {
         IonicDeploy.init($ionicApp.getApp().app_id);
       } else {
         IonicDeploy.redirect($ionicApp.getApp().app_id);
       }
     }
-  };
+  }
 }]);
