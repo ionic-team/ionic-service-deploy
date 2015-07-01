@@ -55,9 +55,6 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
  *            $scope.download_progress = progress;
  *        });
  *    }
- * } else {
- *    // No updates, load the most up to date version of the app
- *    $ionicDeploy.load();
  * }, function(error) {
  *    // Error checking for updates
  * })
@@ -72,6 +69,8 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
     'INITIAL_DELAY',
   function($q, $timeout, $rootScope, $ionicApp, WATCH_INTERVAL, INITIAL_DELAY) {
     return {
+
+      channel_tag: 'production',
 
       /**
        * Watch constantly checks for updates, and triggers an
@@ -124,9 +123,13 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
+          IonicDeploy.check($ionicApp.getApp().app_id, this.channel_tag, function(result) {
             console.log("DEBUG DEPLOY: " + result);
-            deferred.resolve(result === 'true');
+            if(result && result === "true") {
+              deferred.resolve(true);
+            } else {
+              deferred.resolve(false);
+            }
           }, function(error) {
             deferred.reject(error);
           });
@@ -204,6 +207,13 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
       },
 
       /**
+       * Set the deploy channel
+       */
+      setChannel: function(channel_tag) {
+        this.channel_tag = channel_tag;
+      },
+
+      /**
        * This is an all-in-one function that's meant to do all of the update steps
        * in one shot.
        * NB: I think that the way to handle progress is to divide the provided progress result
@@ -214,7 +224,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
 
         if (typeof IonicDeploy != "undefined") {
           // Check for updates
-          IonicDeploy.check($ionicApp.getApp().app_id, function(result) {
+          IonicDeploy.check($ionicApp.getApp().app_id, this.channel_tag, function(result) {
             if (result === 'true') {
               // There are updates, download them
               var downloadProgress = 0;
