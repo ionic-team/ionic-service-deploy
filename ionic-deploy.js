@@ -214,6 +214,25 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
       },
 
       /**
+       * Fetch info about the current deploy
+       */
+      info: function() {
+        var deferred = $q.defer();
+
+        if (typeof IonicDeploy != "undefined") {
+          IonicDeploy.info($ionicApp.getApp().app_id, function(result) {
+            deferred.resolve(result);
+          }, function(err) {
+            deferred.reject(err);
+          });
+        } else {
+          deferred.reject("IonicDeploy plugin not loaded");
+        }
+
+        return deferred.promise;
+      },
+
+      /**
        * This is an all-in-one function that's meant to do all of the update steps
        * in one shot.
        * NB: I think that the way to handle progress is to divide the provided progress result
