@@ -1,6 +1,6 @@
 {
   "name": "ionic-service-deploy",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "http://ionic.io",
   "authors": [
     "Joel Weirauch <joel@drifty.com>",
@@ -11,7 +11,7 @@
   "main": "ionic-deploy.js",
   "license": "Apache2",
   "dependencies": {
-    "ionic-service-core": ">= 0.1.0"
+    "ionic-service-core": ">= 0.1.8"
   },
   "ignore": [
     "**/.*",
