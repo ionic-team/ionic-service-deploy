@@ -135,7 +135,7 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
         var deferred = $q.defer();
 
         if (typeof IonicDeploy != "undefined") {
-          IonicDeploy.check(get_ionic_app_id(), function(result) {
+          IonicDeploy.check(get_ionic_app_id(), this.channel_tag, function(result) {
             console.log("DEBUG DEPLOY: " + result);
             if(result && result === "true") {
               deferred.resolve(true);
