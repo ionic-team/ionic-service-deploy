@@ -1,6 +1,6 @@
 {
   "name": "ionic-service-deploy",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Ionic Deploy Component",
   "dependencies": {
     "ionic-service-core": ">=0.1.9"
