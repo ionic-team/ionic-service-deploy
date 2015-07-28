@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "description": "Ionic Deploy Component",
   "dependencies": {
-    "ionic-service-core": ">=0.1.8"
+    "ionic-service-core": ">=0.1.9"
   },
   "repository": {
     "type": "git",
