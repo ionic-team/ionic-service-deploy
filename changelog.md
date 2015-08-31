@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## 0.2.0
+
+* ES6 Based build system
+* Removed AngularJS dependencies
+* Updated ionic-service-core dependency
+
 ## 0.1.2
 
 * Updated core dependency version

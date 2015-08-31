@@ -1,9 +1,9 @@
 {
   "name": "ionic-service-deploy",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Ionic Deploy Component",
   "dependencies": {
-    "ionic-service-core": ">=0.1.9"
+    "ionic-service-core": ">=0.2.0"
   },
   "repository": {
     "type": "git",
@@ -14,9 +14,23 @@
     "deploy"
   ],
   "author": "Ionic",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/driftyco/ionic-service-deploy/issues"
   },
-  "homepage": "https://github.com/driftyco/ionic-service-deploy#readme"
+  "homepage": "https://github.com/driftyco/ionic-service-deploy#readme",
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "babelify": "^6.2.0",
+    "browser-request": "^0.3.3",
+    "browserify": "^11.0.1",
+    "es6-promise": "^3.0.2",
+    "gulp": "^3.7.0",
+    "gulp-babel": "^5.2.0",
+    "gulp-concat": "^2.2.0",
+    "gulp-footer": "^1.0.4",
+    "gulp-header": "^1.0.2",
+    "gulp-util": "^2.2.16",
+    "gulp-watch": "^0.6.5"
+  }
 }
