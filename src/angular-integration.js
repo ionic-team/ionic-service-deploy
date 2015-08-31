@@ -5,10 +5,5 @@ if((typeof angular === 'object') && angular.module) {
   .factory('$ionicDeploy', [function() {
     var io = ionic.io.init();
     return io.deploy;
-  }])
-
-  .run([function() {
-    var io = ionic.io.init();
-    io.deploy.bootstrap();
   }]);
 }

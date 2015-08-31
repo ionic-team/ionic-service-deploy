@@ -18,37 +18,24 @@
      * Base Usage:
      * 
      *    var io = ionic.io.init();
-     *    io.deploy.bootstrap();
+     *    io.deploy.check().then(null, null, function(hasUpdate) {
+     *      if(hasUpdate) {
+     *        io.deploy.update();
+     *      }
+     *    });
      *
      */
     constructor() {
       var self = this;
       this._plugin = false;
       this._isReady = false;
-      this._bootstrapped = false;
       this._channel_tag = 'production';
       this._emitter = ionic.io.core.main.events;
+      console.log("Ionic Deploy: init");
       ionic.io.core.main.onReady(function() {
         self._isReady = true;
         self._emitter.emit('ionic_deploy:ready');
       });
-    };
-
-    bootstrap() {
-      var self = this;
-      if(!this._bootstrapped) {
-        this._bootstrapped = true;
-        this.onReady(function() {
-          console.log("Ionic Deploy: init");
-          if(self._getPlugin()) {
-            if (ionic.io.core.main.isAndroidDevice()) {
-              self._plugin.init(Settings.get('app_id'));
-            } else {
-              self._plugin.redirect(Settings.get('app_id'));
-            }
-          }
-        });
-      }
     };
 
     /**

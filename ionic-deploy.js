@@ -6,18 +6,15 @@ if (typeof angular === 'object' && angular.module) {
   angular.module('ionic.service.deploy', []).factory('$ionicDeploy', [function () {
     var io = ionic.io.init();
     return io.deploy;
-  }]).run([function () {
-    var io = ionic.io.init();
-    io.deploy.bootstrap();
   }]);
 }
 
 },{}],2:[function(require,module,exports){
-'use strict';
+"use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
 
@@ -39,7 +36,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * Base Usage:
      * 
      *    var io = ionic.io.init();
-     *    io.deploy.bootstrap();
+     *    io.deploy.check().then(null, null, function(hasUpdate) {
+     *      if(hasUpdate) {
+     *        io.deploy.update();
+     *      }
+     *    });
      *
      */
 
@@ -49,9 +50,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var self = this;
       this._plugin = false;
       this._isReady = false;
-      this._bootstrapped = false;
       this._channel_tag = 'production';
       this._emitter = ionic.io.core.main.events;
+      console.log("Ionic Deploy: init");
       ionic.io.core.main.onReady(function () {
         self._isReady = true;
         self._emitter.emit('ionic_deploy:ready');
@@ -59,25 +60,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     _createClass(Deploy, [{
-      key: 'bootstrap',
-      value: function bootstrap() {
-        var self = this;
-        if (!this._bootstrapped) {
-          this._bootstrapped = true;
-          this.onReady(function () {
-            console.log("Ionic Deploy: init");
-            if (self._getPlugin()) {
-              if (ionic.io.core.main.isAndroidDevice()) {
-                self._plugin.init(Settings.get('app_id'));
-              } else {
-                self._plugin.redirect(Settings.get('app_id'));
-              }
-            }
-          });
-        }
-      }
-    }, {
-      key: '_getPlugin',
+      key: "_getPlugin",
 
       /**
        * Fetch the Deploy Plugin
@@ -99,7 +82,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return IonicDeploy;
       }
     }, {
-      key: 'initialize',
+      key: "initialize",
 
       /**
        * Initialize the Deploy Plugin
@@ -110,7 +93,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
       }
     }, {
-      key: 'check',
+      key: "check",
 
       /**
        * Check for updates
@@ -142,7 +125,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'download',
+      key: "download",
 
       /**
        * Download and available update
@@ -174,7 +157,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'extract',
+      key: "extract",
 
       /**
        * Extract the last downloaded update
@@ -204,7 +187,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'load',
+      key: "load",
 
       /**
        * Load the latest deployed version
@@ -223,7 +206,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * event when one is ready.
        */
     }, {
-      key: 'watch',
+      key: "watch",
       value: function watch(options) {
         var deferred = new DeferredPromise();
         var opts = options || {};
@@ -256,7 +239,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'unwatch',
+      key: "unwatch",
 
       /**
        * Stop automatically looking for updates
@@ -266,7 +249,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this._checkTimeout = null;
       }
     }, {
-      key: 'info',
+      key: "info",
 
       /**
        * Information about the current deploy
@@ -290,7 +273,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'setChannel',
+      key: "setChannel",
 
       /**
        * Set the deploy channel that should be checked for updatse
@@ -302,7 +285,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this._channel_tag = channel_tag;
       }
     }, {
-      key: 'update',
+      key: "update",
 
       /**
        * Update app with the latest deploy
@@ -347,7 +330,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return deferred.promise;
       }
     }, {
-      key: 'onReady',
+      key: "onReady",
 
       /**
        * Fire a callback when deploy is ready. This will fire immediately if
