@@ -29,19 +29,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     /**
      * Ionic Deploy
-     * 
-     * This is the main interface that talks with the Ionic Deploy Plugin to facilitate 
+     *
+     * This is the main interface that talks with the Ionic Deploy Plugin to facilitate
      * checking, downloading, and loading an update to your app.
      *
      * Base Usage:
-     * 
+     *
      *    var io = ionic.io.init();
      *    io.deploy.check().then(null, null, function(hasUpdate) {
-     *      if(hasUpdate) {
-     *        io.deploy.update();
-     *      }
+     *      io.deploy.update();
      *    });
      *
+     * @constructor
      */
 
     function Deploy() {
@@ -50,7 +49,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       var self = this;
       this._plugin = false;
       this._isReady = false;
-      this._channel_tag = 'production';
+      this._channelTag = 'production';
       this._emitter = ionic.io.core.main.events;
       console.log("Ionic Deploy: init");
       ionic.io.core.main.onReady(function () {
@@ -59,17 +58,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       });
     }
 
+    /**
+     * Fetch the Deploy Plugin
+     *
+     * If the plugin has not been set yet, attempt to fetch it, otherwise log
+     * a message.
+     *
+     * @return {IonicDeploy} Returns the plugin or false
+     */
+
     _createClass(Deploy, [{
       key: "_getPlugin",
-
-      /**
-       * Fetch the Deploy Plugin
-       * 
-       * If the plugin has not been set yet, attempt to fetch it, otherwise log
-       * a message.
-       *
-       * @return {IonicDeploy} Returns the plugin or false
-       */
       value: function _getPlugin() {
         if (this._plugin) {
           return this._plugin;
@@ -81,32 +80,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this._plugin = IonicDeploy;
         return IonicDeploy;
       }
-    }, {
-      key: "initialize",
 
       /**
        * Initialize the Deploy Plugin
+       * @return {void}
        */
+    }, {
+      key: "initialize",
       value: function initialize() {
         if (this._getPlugin()) {
           this._plugin.initialize(Settings.get('app_id'));
         }
       }
-    }, {
-      key: "check",
 
       /**
        * Check for updates
-       * 
-       * @return {Promise} Will resolve with true if an update is available, false otherwise. A string or 
+       *
+       * @return {Promise} Will resolve with true if an update is available, false otherwise. A string or
        *   error will be passed to reject() in the event of a failure.
        */
+    }, {
+      key: "check",
       value: function check() {
-        var self = this;
         var deferred = new DeferredPromise();
 
         if (this._getPlugin()) {
-          this._plugin.check(Settings.get('app_id'), this._channel_tag, function (result) {
+          this._plugin.check(Settings.get('app_id'), this._channelTag, function (result) {
             if (result && result === "true") {
               console.log('Ionic Deploy: an update is available');
               deferred.resolve(true);
@@ -124,16 +123,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "download",
 
       /**
        * Download and available update
-       * 
-       * This should be used in conjunction with extract() 
+       *
+       * This should be used in conjunction with extract()
        * @return {Promise} The promise which will resolve with true/false or use
        *    notify to update the download progress.
        */
+    }, {
+      key: "download",
       value: function download() {
         var deferred = new DeferredPromise();
 
@@ -156,16 +155,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "extract",
 
       /**
        * Extract the last downloaded update
-       * 
+       *
        * This should be called after a download() successfully resolves.
        * @return {Promise} The promise which will resolve with true/false or use
-       *    notify to update the extraction progress.
+       *                   notify to update the extraction progress.
        */
+    }, {
+      key: "extract",
       value: function extract() {
         var deferred = new DeferredPromise();
 
@@ -186,15 +185,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "load",
 
       /**
        * Load the latest deployed version
        * This is only necessary to call if you have manually downloaded and extracted
        * an update and wish to reload the app with the latest deploy. The latest deploy
        * will automatically be loaded when the app is started.
+       *
+       * @return {void}
        */
+    }, {
+      key: "load",
       value: function load() {
         if (this._getPlugin()) {
           this._plugin.redirect(Settings.get('app_id'));
@@ -204,6 +205,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       /**
        * Watch constantly checks for updates, and triggers an
        * event when one is ready.
+       * @param {object} options Watch configuration options
+       * @return {Promise} returns a promise that will get a notify() callback when an update is available
        */
     }, {
       key: "watch",
@@ -221,7 +224,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         function checkForUpdates() {
           self.check().then(function (hasUpdate) {
-            deferred.notify(hasUpdate);
+            if (hasUpdate) {
+              deferred.notify(hasUpdate);
+            }
           }, function (err) {
             console.warn('Ionic Deploy: Unable to check for updates, ', err);
           });
@@ -238,18 +243,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "unwatch",
 
       /**
        * Stop automatically looking for updates
+       * @return {void}
        */
+    }, {
+      key: "unwatch",
       value: function unwatch() {
         clearTimeout(this._checkTimeout);
         this._checkTimeout = null;
       }
-    }, {
-      key: "info",
 
       /**
        * Information about the current deploy
@@ -257,6 +261,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {Promise} The resolver will be passed an object that has key/value
        *    pairs pertaining to the currently deployed update.
        */
+    }, {
+      key: "info",
       value: function info() {
         var deferred = new DeferredPromise();
 
@@ -272,26 +278,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "setChannel",
 
       /**
        * Set the deploy channel that should be checked for updatse
        * See http://docs.ionic.io/docs/deploy-channels for more information
        *
-       * @param {String} Channel tag
+       * @param {string} channelTag The channel tag to use
+       * @return {void}
        */
-      value: function setChannel(channel_tag) {
-        this._channel_tag = channel_tag;
-      }
     }, {
-      key: "update",
+      key: "setChannel",
+      value: function setChannel(channelTag) {
+        this._channelTag = channelTag;
+      }
 
       /**
        * Update app with the latest deploy
-       * 
-       * This is an all-in-one
+       *
+       * @return {Promise} A promise result
        */
+    }, {
+      key: "update",
       value: function update() {
         var deferred = new DeferredPromise();
         var self = this;
@@ -303,7 +310,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               // There are updates, download them
               var downloadProgress = 0;
               self.download().then(function (result) {
+                if (!result) {
+                  deferred.reject("download error");
+                }
                 self.extract().then(function (result) {
+                  if (!result) {
+                    deferred.reject("extraction error");
+                  }
                   self._plugin.redirect(Settings.get('app_id'));
                 }, function (error) {
                   deferred.reject(error);
@@ -329,21 +342,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return deferred.promise;
       }
-    }, {
-      key: "onReady",
 
       /**
        * Fire a callback when deploy is ready. This will fire immediately if
        * deploy has already become available.
        *
-       * @param {Function} Callback function to fire off
+       * @param {Function} callback Callback function to fire off
+       * @return {void}
        */
+    }, {
+      key: "onReady",
       value: function onReady(callback) {
         var self = this;
         if (this._isReady) {
           callback(self);
         } else {
-          self._emitter.on('ionic_deploy:ready', function (event, data) {
+          self._emitter.on('ionic_deploy:ready', function () {
             callback(self);
           });
         }
@@ -352,8 +366,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     return Deploy;
   })();
-
-  ;
 
   ionic.io.register('deploy');
   ionic.io.deploy.DeployService = Deploy;

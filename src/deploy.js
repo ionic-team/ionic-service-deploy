@@ -11,36 +11,35 @@
 
     /**
      * Ionic Deploy
-     * 
-     * This is the main interface that talks with the Ionic Deploy Plugin to facilitate 
+     *
+     * This is the main interface that talks with the Ionic Deploy Plugin to facilitate
      * checking, downloading, and loading an update to your app.
      *
      * Base Usage:
-     * 
+     *
      *    var io = ionic.io.init();
      *    io.deploy.check().then(null, null, function(hasUpdate) {
-     *      if(hasUpdate) {
-     *        io.deploy.update();
-     *      }
+     *      io.deploy.update();
      *    });
      *
+     * @constructor
      */
     constructor() {
       var self = this;
       this._plugin = false;
       this._isReady = false;
-      this._channel_tag = 'production';
+      this._channelTag = 'production';
       this._emitter = ionic.io.core.main.events;
       console.log("Ionic Deploy: init");
       ionic.io.core.main.onReady(function() {
         self._isReady = true;
         self._emitter.emit('ionic_deploy:ready');
       });
-    };
+    }
 
     /**
      * Fetch the Deploy Plugin
-     * 
+     *
      * If the plugin has not been set yet, attempt to fetch it, otherwise log
      * a message.
      *
@@ -54,30 +53,30 @@
       }
       this._plugin = IonicDeploy;
       return IonicDeploy;
-    };
+    }
 
     /**
      * Initialize the Deploy Plugin
+     * @return {void}
      */
     initialize() {
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         this._plugin.initialize(Settings.get('app_id'));
       }
-    };
+    }
 
     /**
      * Check for updates
-     * 
-     * @return {Promise} Will resolve with true if an update is available, false otherwise. A string or 
+     *
+     * @return {Promise} Will resolve with true if an update is available, false otherwise. A string or
      *   error will be passed to reject() in the event of a failure.
      */
     check() {
-      var self = this;
       var deferred = new DeferredPromise();
 
-      if(this._getPlugin()) {
-        this._plugin.check(Settings.get('app_id'), this._channel_tag, function(result) {
-          if(result && result === "true") {
+      if (this._getPlugin()) {
+        this._plugin.check(Settings.get('app_id'), this._channelTag, function(result) {
+          if (result && result === "true") {
             console.log('Ionic Deploy: an update is available');
             deferred.resolve(true);
           } else {
@@ -93,24 +92,24 @@
       }
 
       return deferred.promise;
-    };
+    }
 
     /**
      * Download and available update
-     * 
-     * This should be used in conjunction with extract() 
+     *
+     * This should be used in conjunction with extract()
      * @return {Promise} The promise which will resolve with true/false or use
      *    notify to update the download progress.
      */
     download() {
       var deferred = new DeferredPromise();
 
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         this._plugin.download(Settings.get('app_id'), function(result) {
           if (result !== 'true' && result !== 'false') {
             deferred.notify(result);
           } else {
-            if(result === 'true') {
+            if (result === 'true') {
               console.log("Ionic Deploy: download complete");
             }
             deferred.resolve(result === 'true');
@@ -123,20 +122,20 @@
       }
 
       return deferred.promise;
-    };
+    }
 
 
     /**
      * Extract the last downloaded update
-     * 
+     *
      * This should be called after a download() successfully resolves.
      * @return {Promise} The promise which will resolve with true/false or use
-     *    notify to update the extraction progress.
+     *                   notify to update the extraction progress.
      */
     extract() {
       var deferred = new DeferredPromise();
 
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         this._plugin.extract(Settings.get('app_id'), function(result) {
           if (result !== 'done') {
             deferred.notify(result);
@@ -152,7 +151,7 @@
       }
 
       return deferred.promise;
-    };
+    }
 
 
     /**
@@ -160,9 +159,11 @@
      * This is only necessary to call if you have manually downloaded and extracted
      * an update and wish to reload the app with the latest deploy. The latest deploy
      * will automatically be loaded when the app is started.
+     *
+     * @return {void}
      */
     load() {
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         this._plugin.redirect(Settings.get('app_id'));
       }
     }
@@ -171,25 +172,27 @@
     /**
      * Watch constantly checks for updates, and triggers an
      * event when one is ready.
+     * @param {object} options Watch configuration options
+     * @return {Promise} returns a promise that will get a notify() callback when an update is available
      */
     watch(options) {
       var deferred = new DeferredPromise();
       var opts = options || {};
       var self = this;
 
-      if(typeof opts.initialDelay === 'undefined') { opts.initialDelay = INITIAL_DELAY; }
-      if(typeof opts.interval === 'undefined') { opts.interval = WATCH_INTERVAL; }
+      if (typeof opts.initialDelay === 'undefined') { opts.initialDelay = INITIAL_DELAY; }
+      if (typeof opts.interval === 'undefined') { opts.interval = WATCH_INTERVAL; }
 
       function checkForUpdates() {
         self.check().then(function(hasUpdate) {
-          deferred.notify(hasUpdate);
+          if (hasUpdate) { deferred.notify(hasUpdate); }
         }, function(err) {
           console.warn('Ionic Deploy: Unable to check for updates, ', err);
         });
 
         // Check our timeout to make sure it wasn't cleared while we were waiting
         // for a server response
-        if(this._checkTimeout) {
+        if (this._checkTimeout) {
           this._checkTimeout = setTimeout(checkForUpdates.bind(self), opts.interval);
         }
       }
@@ -198,15 +201,16 @@
       this._checkTimeout = setTimeout(checkForUpdates.bind(self), opts.initialDelay);
 
       return deferred.promise;
-    };
+    }
 
     /**
      * Stop automatically looking for updates
+     * @return {void}
      */
     unwatch() {
       clearTimeout(this._checkTimeout);
       this._checkTimeout = null;
-    };
+    }
 
     /**
      * Information about the current deploy
@@ -217,7 +221,7 @@
     info() {
       var deferred = new DeferredPromise();
 
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         this._plugin.info(Settings.get('app_id'), function(result) {
           deferred.resolve(result);
         }, function(err) {
@@ -228,35 +232,38 @@
       }
 
       return deferred.promise;
-    };
+    }
 
     /**
      * Set the deploy channel that should be checked for updatse
      * See http://docs.ionic.io/docs/deploy-channels for more information
      *
-     * @param {String} Channel tag
+     * @param {string} channelTag The channel tag to use
+     * @return {void}
      */
-    setChannel(channel_tag) {
-      this._channel_tag = channel_tag;
-    };
+    setChannel(channelTag) {
+      this._channelTag = channelTag;
+    }
 
     /**
      * Update app with the latest deploy
-     * 
-     * This is an all-in-one
+     *
+     * @return {Promise} A promise result
      */
     update() {
       var deferred = new DeferredPromise();
       var self = this;
 
-      if(this._getPlugin()) {
+      if (this._getPlugin()) {
         // Check for updates
         self.check().then(function(result) {
           if (result === true) {
             // There are updates, download them
             var downloadProgress = 0;
             self.download().then(function(result) {
+              if (!result) { deferred.reject("download error"); }
               self.extract().then(function(result) {
+                if (!result) { deferred.reject("extraction error"); }
                 self._plugin.redirect(Settings.get('app_id'));
               }, function(error) {
                 deferred.reject(error);
@@ -281,26 +288,27 @@
       }
 
       return deferred.promise;
-    };
+    }
 
     /**
      * Fire a callback when deploy is ready. This will fire immediately if
      * deploy has already become available.
      *
-     * @param {Function} Callback function to fire off
+     * @param {Function} callback Callback function to fire off
+     * @return {void}
      */
     onReady(callback) {
       var self = this;
-      if(this._isReady) {
+      if (this._isReady) {
         callback(self);
       } else {
-        self._emitter.on('ionic_deploy:ready', function(event, data) {
+        self._emitter.on('ionic_deploy:ready', function() {
           callback(self);
         });
       }
-    };
+    }
 
-  };
+  }
 
   ionic.io.register('deploy');
   ionic.io.deploy.DeployService = Deploy;

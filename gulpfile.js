@@ -7,9 +7,10 @@ var gulp = require('gulp'),
   watch = require('gulp-watch'),
   browserify = require("browserify"),
   babelify = require("babelify"),
+  eslint = require("gulp-eslint"),
   fs = require("fs")
 
-gulp.task('build', function () {
+gulp.task('build', ['lint'], function () {
   browserify({
     entries: buildConfig.jsFiles,
     debug: false,
@@ -17,6 +18,13 @@ gulp.task('build', function () {
   }).bundle()
   .on("error", function (err) { console.log("Error : " + err.message); })
   .pipe(fs.createWriteStream("ionic-deploy.js"));
+});
+
+gulp.task('lint', function () {
+    return gulp.src(['src/**/*.js'])
+        .pipe(eslint())
+        .pipe(eslint.failOnError())
+        .pipe(eslint.formatEach());
 });
 
 gulp.task('watch', ['build'], function() {
