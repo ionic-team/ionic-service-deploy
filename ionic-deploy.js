@@ -1,25 +1,32 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// Add Angular integrations if Angular is available
 'use strict';
 
-if (typeof angular === 'object' && angular.module) {
-  angular.module('ionic.service.deploy', []).factory('$ionicDeploy', [function () {
-    var io = ionic.io.init();
-    return io.deploy;
-  }]);
-}
+(function () {
+  // Add Angular integrations if Angular is available
+  if (typeof angular === 'object' && angular.module) {
+
+    var IonicAngularDeploy = null;
+
+    angular.module('ionic.service.deploy', []).factory('$ionicDeploy', [function () {
+      if (!IonicAngularDeploy) {
+        IonicAngularDeploy = new Ionic.Deploy();
+      }
+      return IonicAngularDeploy;
+    }]);
+  }
+})();
 
 },{}],2:[function(require,module,exports){
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 (function () {
 
-  var Settings = new ionic.io.core.Settings();
-  var DeferredPromise = ionic.io.util.DeferredPromise;
+  var Settings = new Ionic.IO.Settings();
+  var DeferredPromise = Ionic.IO.DeferredPromise;
 
   var NO_PLUGIN = "IONIC_DEPLOY_MISSING_PLUGIN";
   var INITIAL_DELAY = 1 * 5 * 1000;
@@ -35,9 +42,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      *
      * Base Usage:
      *
-     *    var io = ionic.io.init();
-     *    io.deploy.check().then(null, null, function(hasUpdate) {
-     *      io.deploy.update();
+     *    Ionic.io();
+     *    var deploy = new Ionic.Deploy();
+     *    deploy.check().then(null, null, function(hasUpdate) {
+     *      deploy.update();
      *    });
      *
      * @constructor
@@ -47,12 +55,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _classCallCheck(this, Deploy);
 
       var self = this;
+      this.logger = new Ionic.IO.Logger({
+        'prefix': 'Ionic Deploy:'
+      });
       this._plugin = false;
       this._isReady = false;
       this._channelTag = 'production';
-      this._emitter = ionic.io.core.main.events;
-      console.log("Ionic Deploy: init");
-      ionic.io.core.main.onReady(function () {
+      this._emitter = Ionic.IO.Core.getEmitter();
+      this.logger.info("init");
+      Ionic.IO.main.onReady(function () {
         self._isReady = true;
         self._emitter.emit('ionic_deploy:ready');
       });
@@ -68,13 +79,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      */
 
     _createClass(Deploy, [{
-      key: "_getPlugin",
+      key: '_getPlugin',
       value: function _getPlugin() {
         if (this._plugin) {
           return this._plugin;
         }
         if (typeof IonicDeploy === 'undefined') {
-          console.log('Ionic Deploy: plugin is not installed or has not loaded. Have you run `ionic plugin add ionic-plugin-deploy` yet?');
+          this.logger.info('plugin is not installed or has not loaded. Have you run `ionic plugin add ionic-plugin-deploy` yet?');
           return false;
         }
         this._plugin = IonicDeploy;
@@ -86,7 +97,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {void}
        */
     }, {
-      key: "initialize",
+      key: 'initialize',
       value: function initialize() {
         if (this._getPlugin()) {
           this._plugin.initialize(Settings.get('app_id'));
@@ -100,21 +111,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        *   error will be passed to reject() in the event of a failure.
        */
     }, {
-      key: "check",
+      key: 'check',
       value: function check() {
+        var self = this;
         var deferred = new DeferredPromise();
 
         if (this._getPlugin()) {
           this._plugin.check(Settings.get('app_id'), this._channelTag, function (result) {
             if (result && result === "true") {
-              console.log('Ionic Deploy: an update is available');
+              self.logger.info('an update is available');
               deferred.resolve(true);
             } else {
-              console.log('Ionic Deploy: no updates available');
+              self.logger.info('no updates available');
               deferred.resolve(false);
             }
           }, function (error) {
-            console.log('Ionic Deploy: encountered an error while checking for updates');
+            self.logger.error('encountered an error while checking for updates');
             deferred.reject(error);
           });
         } else {
@@ -132,8 +144,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        *    notify to update the download progress.
        */
     }, {
-      key: "download",
+      key: 'download',
       value: function download() {
+        var self = this;
         var deferred = new DeferredPromise();
 
         if (this._getPlugin()) {
@@ -142,7 +155,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               deferred.notify(result);
             } else {
               if (result === 'true') {
-                console.log("Ionic Deploy: download complete");
+                self.logger.info("download complete");
               }
               deferred.resolve(result === 'true');
             }
@@ -164,8 +177,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        *                   notify to update the extraction progress.
        */
     }, {
-      key: "extract",
+      key: 'extract',
       value: function extract() {
+        var self = this;
         var deferred = new DeferredPromise();
 
         if (this._getPlugin()) {
@@ -173,7 +187,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (result !== 'done') {
               deferred.notify(result);
             } else {
-              console.log("Ionic Deploy: extraction complete");
+              self.logger.info("extraction complete");
               deferred.resolve(result);
             }
           }, function (error) {
@@ -195,7 +209,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {void}
        */
     }, {
-      key: "load",
+      key: 'load',
       value: function load() {
         if (this._getPlugin()) {
           this._plugin.redirect(Settings.get('app_id'));
@@ -209,7 +223,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {Promise} returns a promise that will get a notify() callback when an update is available
        */
     }, {
-      key: "watch",
+      key: 'watch',
       value: function watch(options) {
         var deferred = new DeferredPromise();
         var opts = options || {};
@@ -228,7 +242,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               deferred.notify(hasUpdate);
             }
           }, function (err) {
-            console.warn('Ionic Deploy: Unable to check for updates, ', err);
+            self.logger.info('unable to check for updates, ', err);
           });
 
           // Check our timeout to make sure it wasn't cleared while we were waiting
@@ -249,7 +263,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {void}
        */
     }, {
-      key: "unwatch",
+      key: 'unwatch',
       value: function unwatch() {
         clearTimeout(this._checkTimeout);
         this._checkTimeout = null;
@@ -262,7 +276,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        *    pairs pertaining to the currently deployed update.
        */
     }, {
-      key: "info",
+      key: 'info',
       value: function info() {
         var deferred = new DeferredPromise();
 
@@ -287,7 +301,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {void}
        */
     }, {
-      key: "setChannel",
+      key: 'setChannel',
       value: function setChannel(channelTag) {
         this._channelTag = channelTag;
       }
@@ -298,7 +312,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {Promise} A promise result
        */
     }, {
-      key: "update",
+      key: 'update',
       value: function update() {
         var deferred = new DeferredPromise();
         var self = this;
@@ -351,7 +365,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
        * @return {void}
        */
     }, {
-      key: "onReady",
+      key: 'onReady',
       value: function onReady(callback) {
         var self = this;
         if (this._isReady) {
@@ -367,8 +381,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return Deploy;
   })();
 
-  ionic.io.register('deploy');
-  ionic.io.deploy.DeployService = Deploy;
+  Ionic.namespace('Ionic', 'Deploy', Deploy, window);
 })();
 
 },{}]},{},[2,1]);

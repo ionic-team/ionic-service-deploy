@@ -1,8 +1,16 @@
-// Add Angular integrations if Angular is available
-if ((typeof angular === 'object') && angular.module) {
-  angular.module('ionic.service.deploy', [])
+(function() {
+  // Add Angular integrations if Angular is available
+  if ((typeof angular === 'object') && angular.module) {
 
-  .factory('$ionicDeploy', [function() {
-    return Ionic.Deploy;
-  }]);
-}
+    var IonicAngularDeploy = null;
+
+    angular.module('ionic.service.deploy', [])
+
+    .factory('$ionicDeploy', [function() {
+      if (!IonicAngularDeploy) {
+        IonicAngularDeploy = new Ionic.Deploy();
+      }
+      return IonicAngularDeploy;
+    }]);
+  }
+})();
