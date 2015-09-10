@@ -22,7 +22,7 @@
   "eslintConfig": {
     "extends": "eslint:recommended",
     "globals": {
-      "ionic": true,
+      "Ionic": true,
       "angular": true,
       "IonicDeploy": true
     },
@@ -75,9 +75,7 @@
   "devDependencies": {
     "babel": "^5.8.21",
     "babelify": "^6.2.0",
-    "browser-request": "^0.3.3",
     "browserify": "^11.0.1",
-    "es6-promise": "^3.0.2",
     "gulp": "^3.7.0",
     "gulp-babel": "^5.2.0",
     "gulp-concat": "^2.2.0",
