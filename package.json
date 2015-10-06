@@ -5,6 +5,7 @@
   "dependencies": {
     "ionic-service-core": ">=0.1.9"
   },
+  "main": "ionic-deploy.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/driftyco/ionic-service-deploy.git"
